@@ -9,13 +9,17 @@ export default function PoseTracker() {
 
     useEffect(() => {
         const runPoseDetection = async () => {
+            await tf.setBackend("webgl"); // choose GPU backend
             await tf.ready();
-            await tf.setBackend("webgl");
+
+            console.log("TensorFlow backend in use:", tf.getBackend());
 
             // Load MoveNet model
             const detector = await posedetection.createDetector(
                 posedetection.SupportedModels.MoveNet,
-                { modelType: "singlepose.Lightning" }
+                {
+                    modelType: posedetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
+                }
             );
 
             // Access webcam
@@ -85,6 +89,7 @@ export default function PoseTracker() {
 
     return (
         <div style={{ maxWidth: "640px", margin: "0 auto" }}>
+            {/* original cam vid */}
             <video
                 ref={videoRef}
                 style={{ display: "none" }}
@@ -92,6 +97,7 @@ export default function PoseTracker() {
                 autoPlay
                 muted
             />
+            {/* canvas for TFJS */}
             <canvas
                 ref={canvasRef}
                 style={{
